@@ -1,5 +1,6 @@
 "use client";
 
+import EventMedia from "../../../components/EventMedia";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -63,6 +64,7 @@ export default function NewsDetailPage() {
             {event.title}
           </h1>
 
+          <EventMedia imageUrl={event.imageUrl} videoUrl={event.videoUrl} title={event.title} />
           <p className="text-sm text-ink-dim leading-relaxed mb-6">{event.summary}</p>
 
           <dl className="grid grid-cols-2 gap-4 text-xs border-t border-base-line pt-4 mb-6">

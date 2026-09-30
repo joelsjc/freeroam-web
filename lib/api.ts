@@ -1,4 +1,4 @@
-import type { LoginResponse, NewsEvent, NewsListResponse } from "./types";
+import type { LoginResponse, NewsEvent, NewsListResponse, NewsSource, UpdateSourcePayload } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api/v1";
 const TOKEN_KEY = "freeroam_token";
@@ -80,3 +80,15 @@ export async function fetchNewsById(id: string): Promise<NewsEvent> {
 }
 
 export { ApiError };
+
+export async function fetchSources(): Promise<NewsSource[]> {
+  const result = await request<{ data: NewsSource[] } | NewsSource[]>("/admin/news-sources");
+  return Array.isArray(result) ? result : result.data;
+}
+
+export async function updateSource(id: string, payload: UpdateSourcePayload): Promise<NewsSource> {
+  return request<NewsSource>(`/admin/news-sources/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}

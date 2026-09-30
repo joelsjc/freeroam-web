@@ -16,6 +16,8 @@ export interface NewsEvent {
   id: string;
   title: string;
   summary: string;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
   category: string;
   confidence: NewsConfidence;
   importance?: "low" | "medium" | "high" | "urgent";
@@ -38,4 +40,25 @@ export interface LoginResponse {
 export interface NewsListResponse {
   data: NewsEvent[];
   total?: number;
+}
+
+export interface NewsSource {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+  collectionMethod: string;
+  priority: number;
+  trustWeight: number;
+  checkFrequencyMin: number;
+  active: boolean;
+  lastCheckedAt?: string | null;
+  lastFoundAt?: string | null;
+}
+
+export interface UpdateSourcePayload {
+  trustWeight?: number;
+  priority?: number;
+  checkFrequencyMin?: number;
+  active?: boolean;
 }

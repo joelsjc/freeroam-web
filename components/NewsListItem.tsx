@@ -22,6 +22,7 @@ export function NewsListItem({ event }: { event: NewsEvent }) {
       <div className="flex flex-col items-center pt-1 w-14 shrink-0">
         <span className="text-[11px] uppercase text-ink-faint font-medium">{event.category}</span>
       </div>
+      {event.imageUrl && (<img src={event.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-16 w-24 shrink-0 rounded border border-base-line object-cover" />)}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-1">
           <ConfidenceBadge confidence={event.confidence} />
