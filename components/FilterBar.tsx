@@ -1,6 +1,6 @@
 "use client";
 
-const CATEGORIES = ["Todas", "trailer", "gameplay", "mapa", "personagens", "lançamento"];
+const CATEGORIES = ["Todas", "vídeos", "trailer", "gameplay", "mapa", "personagens", "lançamento"];
 const CONFIDENCES = [
   { value: "", label: "Todas" },
   { value: "official", label: "Oficial" },

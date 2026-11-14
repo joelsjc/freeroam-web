@@ -61,13 +61,17 @@ export interface NewsFilters {
   category?: string;
   confidence?: string;
   search?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export async function fetchNews(filters: NewsFilters = {}): Promise<NewsEvent[]> {
   const params = new URLSearchParams();
-  if (filters.category) params.set("category", filters.category);
+  if (filters.category === "vídeos") params.set("hasVideo", "true"); else if (filters.category === "lançamento") params.set("category", "data_lancamento"); else if (filters.category) params.set("category", filters.category);
   if (filters.confidence) params.set("confidence", filters.confidence);
   if (filters.search) params.set("search", filters.search);
+  if (filters.limit) params.set("limit", String(filters.limit));
+  if (filters.offset) params.set("offset", String(filters.offset));
   const qs = params.toString();
 
   const result = await request<NewsListResponse | NewsEvent[]>(`/news${qs ? `?${qs}` : ""}`);

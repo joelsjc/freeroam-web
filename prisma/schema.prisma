@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  PLAYER
+  PRO_PLAYER
+  CREATOR
+}
+
+model User {
+  id               String      @id @default(cuid())
+  email            String      @unique
+  passwordHash     String
+  name             String?
+  role             String      @default("USER")
+  plan             Plan        @default(PLAYER)
+  planExpiresAt    DateTime?
+  stripeCustomerId String?     @unique
+  telegramChatId   String?
+  discordWebhook   String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  savedNews        SavedNews[]
+  mapPins          MapPin[]
+}
+
+model NewsEvent {
+  id          String      @id @default(cuid())
+  title       String
+  summary     String
+  imageUrl    String?
+  videoUrl    String?
+  category    String
+  confidence  String
+  importance  String
+  sourceName  String
+  sourceUrl   String?
+  publishedAt DateTime    @default(now())
+  createdAt   DateTime    @default(now())
+  savedBy     SavedNews[]
+}
+
+model SavedNews {
+  id        String    @id @default(cuid())
+  userId    String
+  newsId    String
+  note      String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  news      NewsEvent @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+}
+
+model MapPin {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  latitude    Float
+  longitude   Float
+  type        String
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// MÓDULO SERVERS — adicionado 25/10/2026
+// ============================================
+
+enum GameStatus {
+  GTA_V
+  GTA_6
+  BOTH
+}
+
+model Server {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  description String     @db.Text
+  country     String
+  languages   String[]
+  styles      String[]
+  allowlist   Boolean    @default(false)
+  featured    Boolean    @default(false)
+  status      GameStatus @default(GTA_V)
+  tags        String[]
+  officialUrl String?
+  discordUrl  String?
+  verified    Boolean    @default(false)
+  ratingAvg   Float      @default(0)
+  ratingCount Int        @default(0)
+  visitCount  Int        @default(0)
+
+  ratings Rating[]
+  visits  ServerVisit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, featured])
+  @@index([ratingAvg(sort: Desc)])
+  @@index([country])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  serverId  String
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  userId    String?
+  name      String
+  email     String
+  stars     Int
+  comment   String?  @db.Text
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([serverId, approved])
+}
+
+model WaitlistEmail {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  source       String
+  confirmed    Boolean  @default(false)
+  confirmToken String?
+  createdAt    DateTime @default(now())
+
+  @@index([source, confirmed])
+}
+
+model SaasPlan {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  tier       String
+  cycle      String
+  name       String
+  priceCents Int
+  benefits   Json
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String
+  planCode        String
+  plan            SaasPlan? @relation(fields: [planCode], references: [code])
+  status          String
+  mpPreapprovalId String?   @unique
+  startedAt       DateTime  @default(now())
+  endsAt          DateTime?
+  autoRenew       Boolean   @default(true)
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+
+model ServerVisit {
+  id        String   @id @default(cuid())
+  serverId  String
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  event     String
+  referrer  String?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([serverId, event])
+}

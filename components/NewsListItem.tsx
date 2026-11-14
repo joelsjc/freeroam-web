@@ -26,6 +26,7 @@ export function NewsListItem({ event }: { event: NewsEvent }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-1">
           <ConfidenceBadge confidence={event.confidence} />
+            {event.videoUrl ? (<span className="rounded-full border border-signal px-2 text-[11px] text-signal">▶ vídeo</span>) : null}
           {event.sourceCount ? (
             <span className="text-xs text-ink-faint">{event.sourceCount} fontes</span>
           ) : null}

@@ -8,6 +8,8 @@ import { NewsListItem } from "@/components/NewsListItem";
 import { FilterBar } from "@/components/FilterBar";
 import { RadarPulse } from "@/components/RadarPulse";
 
+const PAGE_SIZE = 30;
+
 export default function FeedPage() {
   const router = useRouter();
   const [events, setEvents] = useState<NewsEvent[]>([]);
@@ -16,13 +18,16 @@ export default function FeedPage() {
   const [category, setCategory] = useState("");
   const [confidence, setConfidence] = useState("");
   const [search, setSearch] = useState("");
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchNews({ category, confidence, search });
+      const data = await fetchNews({ category, confidence, search, limit: PAGE_SIZE, offset: 0 });
       setEvents(data);
+      setHasMore(data.length === PAGE_SIZE);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         clearToken();
@@ -43,6 +48,19 @@ export default function FeedPage() {
     load();
   }, [load, router]);
 
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      const data = await fetchNews({ category, confidence, search, limit: PAGE_SIZE, offset: events.length });
+      setEvents((prev) => [...prev, ...data]);
+      setHasMore(data.length === PAGE_SIZE);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   function handleLogout() {
     clearToken();
     router.push("/login");
@@ -53,7 +71,7 @@ export default function FeedPage() {
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <RadarPulse size={28} />
-          <h1 className="font-display font-bold text-base text-ink">Freeroam Radar</h1>
+          <h1 className="font-display font-bold text-base bg-gradient-to-r from-[#FF2E88] via-white to-[#00E5FF] bg-clip-text text-transparent">Freeroam Radar</h1>
         </div>
         <button onClick={handleLogout} className="text-xs text-ink-faint hover:text-ink transition-colors">
           Sair
@@ -90,6 +108,12 @@ export default function FeedPage() {
         {!loading &&
           !error &&
           events.map((event) => <NewsListItem key={event.id} event={event} />)}
+
+        {!loading && !error && hasMore && (
+          <button onClick={loadMore} disabled={loadingMore} className="w-full mt-4 py-3 text-sm text-signal border border-base-line rounded hover:bg-base-raised transition-colors">
+            {loadingMore ? "Carregando..." : "Carregar mais"}
+          </button>
+        )}
       </section>
     </main>
   );
