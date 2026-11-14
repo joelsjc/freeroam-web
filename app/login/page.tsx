@@ -41,7 +41,7 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="font-display font-bold text-4xl mb-2 text-center text-primary">Freeroam Radar</h1>
+      <h1 className="font-display font-bold text-4xl mb-2 text-center bg-gradient-to-r from-[#FF2E88] via-white to-[#00E5FF] bg-clip-text text-transparent">Freeroam Radar</h1>
       <p className="text-ink-faint text-sm text-center mb-8">Inteligência GTA VI para criadores</p>
       {justRegistered && (
         <p className="text-secondary text-sm text-center mb-4 bg-secondary/10 border border-secondary/20 rounded-lg p-2">
